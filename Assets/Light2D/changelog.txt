@@ -1,0 +1,23 @@
+v1.2.1
+Added LightObstacleScale property to LightObstacleGenerator.
+Fixed bug with perspective camera.
+64 bit color will be turned off if device is not supports it.
+In-game changes of camera's field of view is correctly handled.
+Removed "Light 8 Points" shader. It will fall back to light 20.
+More shaders documented.
+
+v1.2:
+Better support for 2D Toolkit.
+Better support for perspective camera.
+Usability improved.
+Shader compilation on mobiles fixed.
+Other bugs fixed.
+
+v1.1:
+Perspective camera support. Use LightCameraFovAdd instead LightCameraSizeAdd for perspective camera.
+
+v1.0.1:
+Unity 5 support.
+
+v1.0:
+Initial release.
