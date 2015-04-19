@@ -8,7 +8,8 @@ public class OrbController : MonoBehaviour {
 	public float chargeRate;
 	public Collider2D focusBeam;
 	public Light2D.LightSprite orbGlow;
-	public AudioClip[] chargeSFX; 
+	public AudioClip[] chargeSFX;
+	public GameObject orbManager;
 
 	private float chargeLevel;
 	private float maxCharge = 100f;
@@ -53,6 +54,7 @@ public class OrbController : MonoBehaviour {
 				fullyCharged = true;
 				orbSFX.PlayOneShot(chargeSFX[2]);
 				charging = false;
+				orbManager.BroadcastMessage("OnOrbCharged");
 			} else {
 				chargeLevel += (chargeRate * Time.deltaTime);
 				if (chargeLevel > 10f && !firstChargeLevel) {

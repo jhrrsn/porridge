@@ -15,7 +15,7 @@ GameObject:
   - 61: {fileID: 6114168}
   m_Layer: 9
   m_Name: Spotlight
-  m_TagString: Untagged
+  m_TagString: focusBeam
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -55,7 +55,7 @@ GameObject:
   - 82: {fileID: 8271394}
   m_Layer: 8
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -78,8 +78,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 163242}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -12.46, y: 7.03999996, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: .642787695, w: .766044378}
+  m_LocalPosition: {x: 15.3999996, y: -9.60000038, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 450842}
@@ -169,7 +169,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: .5
   m_AngularDrag: .100000001
-  m_GravityScale: .100000001
+  m_GravityScale: 1
   m_FixedAngle: 1
   m_IsKinematic: 0
   m_Interpolate: 0
@@ -207,7 +207,7 @@ BoxCollider2D:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 127304}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_UsedByEffector: 0
@@ -292,8 +292,8 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_audioClip: {fileID: 8300000, guid: 382f740f3580a410c8e751ca7dc45946, type: 3}
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 1
@@ -381,10 +381,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveForce: 6
-  moveMaxSpeed: 1.5
+  moveMaxSpeed: 4
   jetForce: 15
   jetMaxSpeed: 4
-  jetDrain: .100000001
+  batteryDrain: .100000001
   batteryMaxCapacity: 600
   batteryRecharge: 4
   batteryChargeDelay: .100000001
@@ -395,17 +395,20 @@ MonoBehaviour:
   searchBeamPassiveUse: .25
   focusBeamWidth: 1
   focusBeamIntensity: 1
+  focusBeamDrain: 10
   beamTweening: 4
   spotlightAudio: {fileID: 8300000, guid: 9d3125fb597394d288dcb424d206d315, type: 3}
-  hoverAudio: {fileID: 8300000, guid: 0c1f1e672c5d9448bb89522f38b175e9, type: 3}
+  hoverAudio: {fileID: 8300000, guid: 382f740f3580a410c8e751ca7dc45946, type: 3}
   collisionClips:
   - {fileID: 8300000, guid: a55d5ff3b191b4fc995a2c60dea971cf, type: 3}
   - {fileID: 8300000, guid: 2361a105a94244244b5d81882b794d30, type: 3}
   - {fileID: 8300000, guid: 475f433ecec7043adb99eb8530a8abf6, type: 3}
   - {fileID: 8300000, guid: f7e891588ce54472c9002a8983e40814, type: 3}
+  - {fileID: 8300000, guid: d5b73bb983d0142ec9c7168ec610d9e9, type: 3}
   spotlight: {fileID: 127304}
   spotlightBeam: {fileID: 11490160}
   eyeLight: {fileID: 11417194}
+  door: {fileID: 0}
 --- !u!114 &11429446
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -32,6 +32,8 @@ public class PlayerController : MonoBehaviour {
 	public Light2D.LightSprite spotlightBeam;
 	public Light2D.LightSprite eyeLight;
 
+	public GameObject door;
+
 	static public bool facingRight;
 
 	private AudioSource miscSFX;
@@ -42,6 +44,7 @@ public class PlayerController : MonoBehaviour {
 	private float batteryPower;
 	private float engineUsage;
 	private float hoverClipPlaytime;
+	private int currentLevel;
 	private bool focusBeamActive;
 	private bool spotlightOn;
 	private bool outOfPower;
@@ -52,14 +55,13 @@ public class PlayerController : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-		upright = transform.rotation;
-		outOfPower = false;
+		upright = new Quaternion (0f, 0f, 0f, 1f);
+		facingRight = false;
 		moving = false;
 		hoverClipPlaying = false;
 		spotlightOn = false;
 		focusBeamActive = false;
 		batteryCapacity = batteryMaxCapacity;
-		batteryPower = batteryCapacity;
 		engineUsage = 0f;
 		batteryTimeLastUsed = Time.time;
 		rb = GetComponent<Rigidbody2D> ();
@@ -68,13 +70,42 @@ public class PlayerController : MonoBehaviour {
 		miscSFX = audioSources [0];
 		miscSFX.volume = 0.8f;
 		hoverSFX = audioSources [1];
+		currentLevel = Application.loadedLevel;
+		if (currentLevel == 0) {
+			Physics2D.gravity = new Vector2 (0f, 0f);
+			batteryPower = 0f;
+			outOfPower = true;
+			rb.fixedAngle = false;
+		} else if (currentLevel == 1) {
+			Physics2D.gravity = new Vector2 (0f, 0f);
+			batteryPower = batteryCapacity * 0.75f;
+			SpotlightToggle (false);
+			hoverSFX.Play ();
+			hoverSFX.volume = 0f;
+			hoverSFX.pitch = 1f;
+			hoverClipPlaying = true;
+			rb.velocity = new Vector2 (-4f, 0f);
+			outOfPower = false;
+		} else if (currentLevel == 2) {
+			batteryPower = batteryCapacity * 0.75f;
+			SpotlightToggle (false);
+			hoverSFX.Play ();
+			hoverSFX.volume = 0f;
+			hoverSFX.pitch = 1f;
+			hoverClipPlaying = true;
+			rb.velocity = new Vector2 (4f, 3f);
+			outOfPower = false;
+		} else {
+			batteryPower = batteryCapacity;
+			outOfPower = false;
+		}
 	}
 
 
 	void Update () {
 
-		if (Input.GetButtonDown("LightToggle")) {
-			SpotlightToggle();
+		if (Input.GetButtonDown("LightToggle") && !outOfPower) {
+			SpotlightToggle(true);
 		}
 
 
@@ -82,6 +113,11 @@ public class PlayerController : MonoBehaviour {
 			FocusBeam ();
 		} else {
 			DefocusBeam();
+		}
+
+		if (((currentLevel == 1 && transform.position.x < -12.5f) || (currentLevel == 2 && transform.position.x > -27f)) && Time.timeSinceLevelLoad < 5f && !door.activeSelf) {
+			door.SetActive(true);
+			door.BroadcastMessage("PlayOpenSFX");
 		}
 
 	}
@@ -122,7 +158,7 @@ public class PlayerController : MonoBehaviour {
 			float xForce;
 			float yForce;
 
-			if (rb.velocity.x < moveMaxSpeed) {
+			if (Mathf.Abs (rb.velocity.x) < moveMaxSpeed) {
 				xForce = h * moveForce;
 			} else {
 				xForce = 0f;
@@ -151,24 +187,31 @@ public class PlayerController : MonoBehaviour {
 		}
 
 		// Check if not moving
-		if (rb.velocity.x == 0f && rb.velocity.y == 0f) {
+		if (rb.velocity.x <= 0.1f && rb.velocity.y <= 0.1f) {
 			moving = false;
 		}
 	
 		// Engine noise
 		if (engineUsage > 0f && !hoverClipPlaying) {
-			hoverSFX.PlayOneShot (hoverAudio);
-			hoverClipPlaytime = Time.time;
-			hoverSFX.volume = 1f;
+			hoverSFX.Play ();
+			hoverSFX.volume = 0f;
 			hoverSFX.pitch = 1f;
 			hoverClipPlaying = true;
-		} else if (engineUsage > 0f && hoverClipPlaying && Time.time - hoverClipPlaytime > 5f) {
-			hoverSFX.pitch = map (engineUsage, 0f, 20f, 0.96f, 1.04f);
-		} else if ((engineUsage <= 0f && hoverClipPlaying && Time.time - hoverClipPlaytime > 5f) || outOfPower || !moving) {
+		} else if (engineUsage > 0f && hoverClipPlaying) {
+			if (hoverSFX.volume < 1f) {
+				hoverSFX.volume += Time.deltaTime * 0.5f;
+			}
+			float targetPitch = map (engineUsage, 0f, 20f, 0.90f, 1.1f);
+			if (hoverSFX.pitch > targetPitch) {
+				hoverSFX.pitch -= Time.deltaTime * 0.5f;
+			} else if (hoverSFX.pitch < targetPitch) {
+				hoverSFX.pitch += Time.deltaTime * 0.5f;
+			}
+		} else if ((engineUsage <= 0f && hoverClipPlaying) || outOfPower || !moving) {
 			hoverSFX.volume -= Time.deltaTime * 0.1f;
 			hoverSFX.pitch -= Time.deltaTime * 0.1f;
 
-			if (hoverSFX.volume <= 0.1f) {
+			if (hoverSFX.pitch <= 0.1f) {
 				hoverSFX.Stop();
 				hoverClipPlaying = false;
 			}
@@ -197,7 +240,7 @@ public class PlayerController : MonoBehaviour {
 		outOfPower = true;
 		rb.fixedAngle = false;
 		if (spotlightOn) {
-			SpotlightToggle();
+			SpotlightToggle(true);
 		}
 		Color lightColor = new Color (1f, 0.5f, 0.5f, 1f);
 		eyeLight.Color = lightColor;
@@ -276,10 +319,10 @@ public class PlayerController : MonoBehaviour {
 			}
 	}
 
-	void SpotlightToggle() {
+	void SpotlightToggle(bool playSound) {
 		if (spotlightOn) {
 			miscSFX.pitch = 0.8f;
-			miscSFX.PlayOneShot(spotlightAudio);
+			if (playSound) miscSFX.PlayOneShot(spotlightAudio);
 			spotlightOn = false;
 			spotlight.SetActive(false);
 			batteryCapacity = batteryMaxCapacity;
@@ -288,7 +331,7 @@ public class PlayerController : MonoBehaviour {
 			}
 		} else {
 			miscSFX.pitch = 1f;
-			miscSFX.PlayOneShot(spotlightAudio);
+			if (playSound) miscSFX.PlayOneShot(spotlightAudio);
 			spotlightOn = true;
 			spotlight.SetActive(true);
 			batteryCapacity = batteryMaxCapacity * (1-searchBeamPassiveUse);
@@ -312,8 +355,11 @@ public class PlayerController : MonoBehaviour {
 		float rel_v = collision.relativeVelocity.magnitude;
 		if (rel_v > 5f || (rel_v > 2 && outOfPower)) {
 			miscSFX.pitch = 1f;
-			int clip = Random.Range(0, 3);
-			miscSFX.PlayOneShot(collisionClips[clip]);
+			int clip = Random.Range (0, 3);
+			miscSFX.PlayOneShot (collisionClips [clip]);
+		} else if (rel_v > 1f) {
+			miscSFX.pitch = 1f;
+			miscSFX.PlayOneShot (collisionClips [4]);
 		}
 	}
 }
