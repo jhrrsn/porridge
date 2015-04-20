@@ -21,12 +21,16 @@ public class OrbManager : MonoBehaviour {
 
 	void OrbActions() {
 		// Open Level Exit Door
-		GameObject door = GameObject.FindGameObjectWithTag("door");
-		door.BroadcastMessage("OpenDoor");
+		Invoke ("OpenDoor", 0.5f);
 		
 		// Level 2
 		if (level == 2) {
 			Physics2D.gravity = new Vector2 (0f, -9.81f);
 		}
+	}
+
+	void OpenDoor() {
+		GameObject door = GameObject.FindGameObjectWithTag("door");
+		door.BroadcastMessage("OpenDoor");
 	}
 }

@@ -9,6 +9,7 @@ TagManager:
   - orb
   - player
   - door
+  - ava
   layers:
   - Default
   - TransparentFX

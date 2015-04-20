@@ -82,7 +82,7 @@ Material:
       data:
         first:
           name: _Offest
-        second: {r: .00068927079, g: -.000787520374, b: 0, a: 0}
+        second: {r: -.0002110942, g: -.000723838806, b: 0, a: 0}
       data:
         first:
           name: _Shift

@@ -25,6 +25,8 @@ public class PlayerController : MonoBehaviour {
 	public float beamTweening;
 
 	public AudioClip spotlightAudio;
+	public AudioClip outOfPowerAudio;
+	public AudioClip focusBeamAudio;
 	public AudioClip hoverAudio;
 	public AudioClip[] collisionClips;
 
@@ -36,8 +38,10 @@ public class PlayerController : MonoBehaviour {
 
 	static public bool facingRight;
 
+	private GameObject ava;
 	private AudioSource miscSFX;
 	private AudioSource hoverSFX;
+	private AudioSource beamSFX;
 	private Quaternion upright;
 	private float batteryCapacity;
 	private float batteryTimeLastUsed;
@@ -46,10 +50,13 @@ public class PlayerController : MonoBehaviour {
 	private float hoverClipPlaytime;
 	private int currentLevel;
 	private bool focusBeamActive;
+	private bool focusClipPlaying;
 	private bool spotlightOn;
+	private bool spotlightFirstTime;
 	private bool outOfPower;
 	private bool moving;
 	private bool hoverClipPlaying;
+	private bool firstOrb;
 	private Rigidbody2D rb;
 	private SpriteRenderer rend;
 	
@@ -60,7 +67,10 @@ public class PlayerController : MonoBehaviour {
 		moving = false;
 		hoverClipPlaying = false;
 		spotlightOn = false;
+		spotlightFirstTime = false;
 		focusBeamActive = false;
+		focusClipPlaying = false;
+		firstOrb = false;
 		batteryCapacity = batteryMaxCapacity;
 		engineUsage = 0f;
 		batteryTimeLastUsed = Time.time;
@@ -70,11 +80,16 @@ public class PlayerController : MonoBehaviour {
 		miscSFX = audioSources [0];
 		miscSFX.volume = 0.8f;
 		hoverSFX = audioSources [1];
+		beamSFX = audioSources [2];
 		currentLevel = Application.loadedLevel;
+		ava = GameObject.FindGameObjectWithTag ("ava");
 		if (currentLevel == 0) {
+			ava.BroadcastMessage("PlayClip", "wakeUpClip");
+			firstOrb = true;
+			spotlightFirstTime = true;
 			Physics2D.gravity = new Vector2 (0f, 0f);
 			batteryPower = 0f;
-			outOfPower = true;
+//			outOfPower = true;
 			rb.fixedAngle = false;
 		} else if (currentLevel == 1) {
 			Physics2D.gravity = new Vector2 (0f, 0f);
@@ -104,6 +119,11 @@ public class PlayerController : MonoBehaviour {
 
 	void Update () {
 
+		if (firstOrb && currentLevel == 0 && transform.position.x < -14f) {
+			ava.BroadcastMessage("PlayClip", "orbClip");
+			firstOrb = false;
+		}
+
 		if (Input.GetButtonDown("LightToggle") && !outOfPower) {
 			SpotlightToggle(true);
 		}
@@ -111,8 +131,16 @@ public class PlayerController : MonoBehaviour {
 
 		if (Input.GetButton("Fire1") && spotlightOn) {
 			FocusBeam ();
+			if (!focusClipPlaying) {
+				focusClipPlaying = true;
+				beamSFX.PlayOneShot(focusBeamAudio);
+			}
 		} else {
 			DefocusBeam();
+			if (focusClipPlaying) {
+				focusClipPlaying = false;
+				beamSFX.Stop();
+			}
 		}
 
 		if (((currentLevel == 1 && transform.position.x < -12.5f) || (currentLevel == 2 && transform.position.x > -27f)) && Time.timeSinceLevelLoad < 5f && !door.activeSelf) {
@@ -179,7 +207,7 @@ public class PlayerController : MonoBehaviour {
 			batteryPower -= forceVector.magnitude * batteryDrain;
 			SetBatteryText ();
 			batteryTimeLastUsed = Time.time;
-		} else if (batteryPower < 0.1f) {
+		} else if (batteryPower < 0.1f && !outOfPower) {
 			engineUsage = 0f;
 			PowerDown ();
 		} else {
@@ -198,7 +226,7 @@ public class PlayerController : MonoBehaviour {
 			hoverSFX.pitch = 1f;
 			hoverClipPlaying = true;
 		} else if (engineUsage > 0f && hoverClipPlaying) {
-			if (hoverSFX.volume < 1f) {
+			if (hoverSFX.volume < 0.6f) {
 				hoverSFX.volume += Time.deltaTime * 0.5f;
 			}
 			float targetPitch = map (engineUsage, 0f, 20f, 0.90f, 1.1f);
@@ -237,6 +265,7 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	void PowerDown() {
+		if (Time.timeSinceLevelLoad > 5f) miscSFX.PlayOneShot (outOfPowerAudio);
 		outOfPower = true;
 		rb.fixedAngle = false;
 		if (spotlightOn) {
@@ -257,6 +286,7 @@ public class PlayerController : MonoBehaviour {
 			}
 		}
 		else if (batteryPower >= batteryCapacity) {
+			if (outOfPower) ava.BroadcastMessage("PlayClip", "onAwakeClip");
 			outOfPower = false;
 			rend.color = new Color (1, 1, 1);
 			Color lightColor = new Color (0.85f, 1f, 1f, 0.6f);
@@ -337,7 +367,12 @@ public class PlayerController : MonoBehaviour {
 			batteryCapacity = batteryMaxCapacity * (1-searchBeamPassiveUse);
 			batteryPower -= (batteryMaxCapacity - batteryCapacity);
 
-			if (batteryPower <= 0f) {
+			if (spotlightFirstTime) {
+				ava.BroadcastMessage("PlayClip", "spotlightFirstClip");
+				spotlightFirstTime = false;
+			}
+			
+			if (batteryPower <= 0f && !outOfPower) {
 				batteryPower = 0f;
 				SetBatteryText();
 				PowerDown();
