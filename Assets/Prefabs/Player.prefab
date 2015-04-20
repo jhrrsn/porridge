@@ -468,7 +468,8 @@ MonoBehaviour:
   focusBeamDrain: 10
   beamTweening: 4
   spotlightAudio: {fileID: 8300000, guid: 9d3125fb597394d288dcb424d206d315, type: 3}
-  outOfPowerAudio: {fileID: 8300000, guid: 5dc905311f32c48c0928baf6af1d0978, type: 3}
+  powerUpAudio: {fileID: 8300000, guid: ea8428074a2a6462ba82ab6503c4c0a7, type: 3}
+  outOfPowerAudio: {fileID: 8300000, guid: 413e1f3a536cb46b7927e947fd973a28, type: 3}
   focusBeamAudio: {fileID: 8300000, guid: 70b703d03705f43d787ad05d9d83355a, type: 3}
   hoverAudio: {fileID: 8300000, guid: 382f740f3580a410c8e751ca7dc45946, type: 3}
   collisionClips:

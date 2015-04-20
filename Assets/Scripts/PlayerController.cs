@@ -25,6 +25,7 @@ public class PlayerController : MonoBehaviour {
 	public float beamTweening;
 
 	public AudioClip spotlightAudio;
+	public AudioClip powerUpAudio;
 	public AudioClip outOfPowerAudio;
 	public AudioClip focusBeamAudio;
 	public AudioClip hoverAudio;
@@ -83,7 +84,7 @@ public class PlayerController : MonoBehaviour {
 		beamSFX = audioSources [2];
 		currentLevel = Application.loadedLevel;
 		ava = GameObject.FindGameObjectWithTag ("ava");
-		if (currentLevel == 0) {
+		if (currentLevel == 1) {
 			ava.BroadcastMessage("PlayClip", "wakeUpClip");
 			firstOrb = true;
 			spotlightFirstTime = true;
@@ -91,7 +92,7 @@ public class PlayerController : MonoBehaviour {
 			batteryPower = 0f;
 //			outOfPower = true;
 			rb.fixedAngle = false;
-		} else if (currentLevel == 1) {
+		} else if (currentLevel == 2) {
 			Physics2D.gravity = new Vector2 (0f, 0f);
 			batteryPower = batteryCapacity * 0.75f;
 			SpotlightToggle (false);
@@ -101,7 +102,7 @@ public class PlayerController : MonoBehaviour {
 			hoverClipPlaying = true;
 			rb.velocity = new Vector2 (-4f, 0f);
 			outOfPower = false;
-		} else if (currentLevel == 2) {
+		} else if (currentLevel >= 3) {
 			batteryPower = batteryCapacity * 0.75f;
 			SpotlightToggle (false);
 			hoverSFX.Play ();
@@ -110,6 +111,7 @@ public class PlayerController : MonoBehaviour {
 			hoverClipPlaying = true;
 			rb.velocity = new Vector2 (4f, 3f);
 			outOfPower = false;
+			if (currentLevel == 4) ava.BroadcastMessage("PlayClip", "carefulClip");
 		} else {
 			batteryPower = batteryCapacity;
 			outOfPower = false;
@@ -119,7 +121,7 @@ public class PlayerController : MonoBehaviour {
 
 	void Update () {
 
-		if (firstOrb && currentLevel == 0 && transform.position.x < -14f) {
+		if (firstOrb && currentLevel == 1 && transform.position.x < -14f) {
 			ava.BroadcastMessage("PlayClip", "orbClip");
 			firstOrb = false;
 		}
@@ -143,7 +145,7 @@ public class PlayerController : MonoBehaviour {
 			}
 		}
 
-		if (((currentLevel == 1 && transform.position.x < -12.5f) || (currentLevel == 2 && transform.position.x > -27f)) && Time.timeSinceLevelLoad < 5f && !door.activeSelf) {
+		if (((currentLevel == 2 && transform.position.x < -12.5f) || (currentLevel >= 3 && transform.position.x > -27f)) && Time.timeSinceLevelLoad < 5f && !door.activeSelf) {
 			door.SetActive(true);
 			door.BroadcastMessage("PlayOpenSFX");
 		}
@@ -215,7 +217,7 @@ public class PlayerController : MonoBehaviour {
 		}
 
 		// Check if not moving
-		if (rb.velocity.x <= 0.1f && rb.velocity.y <= 0.1f) {
+		if (Mathf.Abs(rb.velocity.x) <= 0.1f && Mathf.Abs(rb.velocity.y) <= 0.1f) {
 			moving = false;
 		}
 	
@@ -226,7 +228,7 @@ public class PlayerController : MonoBehaviour {
 			hoverSFX.pitch = 1f;
 			hoverClipPlaying = true;
 		} else if (engineUsage > 0f && hoverClipPlaying) {
-			if (hoverSFX.volume < 0.6f) {
+			if (hoverSFX.volume < 0.4f) {
 				hoverSFX.volume += Time.deltaTime * 0.5f;
 			}
 			float targetPitch = map (engineUsage, 0f, 20f, 0.90f, 1.1f);
@@ -286,7 +288,10 @@ public class PlayerController : MonoBehaviour {
 			}
 		}
 		else if (batteryPower >= batteryCapacity) {
-			if (outOfPower) ava.BroadcastMessage("PlayClip", "onAwakeClip");
+			if (outOfPower) { 
+				ava.BroadcastMessage("PlayClip", "onAwakeClip");
+				miscSFX.PlayOneShot(powerUpAudio);
+			}
 			outOfPower = false;
 			rend.color = new Color (1, 1, 1);
 			Color lightColor = new Color (0.85f, 1f, 1f, 0.6f);
@@ -387,14 +392,20 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	void OnCollisionEnter2D(Collision2D collision) {
-		float rel_v = collision.relativeVelocity.magnitude;
-		if (rel_v > 5f || (rel_v > 2 && outOfPower)) {
-			miscSFX.pitch = 1f;
-			int clip = Random.Range (0, 3);
-			miscSFX.PlayOneShot (collisionClips [clip]);
-		} else if (rel_v > 1f) {
-			miscSFX.pitch = 1f;
-			miscSFX.PlayOneShot (collisionClips [4]);
+		if (collision.gameObject.tag == "squid" & !outOfPower) {
+			batteryPower = 0f;
+			SetBatteryText();
+			PowerDown();
+		} else {
+			float rel_v = collision.relativeVelocity.magnitude;
+			if (rel_v > 5f || (rel_v > 2 && outOfPower)) {
+				miscSFX.pitch = 1f;
+				int clip = Random.Range (0, 3);
+				miscSFX.PlayOneShot (collisionClips [clip]);
+			} else if (rel_v > 1f) {
+				miscSFX.pitch = 1f;
+				miscSFX.PlayOneShot (collisionClips [4]);
+			}
 		}
 	}
 }

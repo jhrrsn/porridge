@@ -52,8 +52,8 @@ public class OrbController : MonoBehaviour {
 			charging = true;
 			if (chargeLevel >= maxCharge) {
 				fullyCharged = true;
-				if (Application.loadedLevel == 0) GameObject.FindGameObjectWithTag ("ava").BroadcastMessage("PlayClip", "doorOpenClip");
-				else if (Application.loadedLevel == 1) GameObject.FindGameObjectWithTag ("ava").BroadcastMessage("PlayClip", "gravityOnlineClip");
+				if (Application.loadedLevel == 1) GameObject.FindGameObjectWithTag ("ava").BroadcastMessage("PlayClip", "doorOpenClip");
+				else if (Application.loadedLevel == 2) GameObject.FindGameObjectWithTag ("ava").BroadcastMessage("PlayClip", "gravityOnlineClip");
 				orbSFX.PlayOneShot(chargeSFX[2]);
 				charging = false;
 				orbManager.BroadcastMessage("OnOrbCharged");

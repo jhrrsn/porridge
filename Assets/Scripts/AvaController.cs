@@ -28,11 +28,13 @@ public class AvaController : MonoBehaviour {
 		else if (clipToPlay == "doorOpenClip")
 			Invoke ("PlayDoorOpenClip", 2f);
 		else if (clipToPlay == "onAwakeClip") 
-			Invoke ("PlayOnAwakeClip", 1f);
+			Invoke ("PlayOnAwakeClip", 2f);
 		else if (clipToPlay == "spotlightFirstClip") 
 			Invoke ("PlaySpotlightFirstClip", 1f);
 		else if (clipToPlay == "gravityOnlineClip")  
 			Invoke ("PlayGravityOnlineClip", 1.5f);
+		else if (clipToPlay == "carefulClip")
+			Invoke ("PlayCarefulClip", 2f);
 	}
 
 	void PlayOnAwakeClip() {
@@ -49,5 +51,9 @@ public class AvaController : MonoBehaviour {
 
 	void PlayGravityOnlineClip() {
 		speechSource.PlayOneShot (gravityOnlineClip);
+	}
+
+	void PlayCarefulClip() {
+		speechSource.PlayOneShot (carefulClip);
 	}
 }
