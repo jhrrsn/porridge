@@ -9,6 +9,7 @@ public class AvaController : MonoBehaviour {
 	public AudioClip lowGClip;
 	public AudioClip carefulClip;
 	public AudioClip orbClip;
+	public AudioClip orbNotEnough;
 	public AudioClip doorOpenClip;
 	public AudioClip gravityOnlineClip;
 
@@ -25,6 +26,8 @@ public class AvaController : MonoBehaviour {
 			speechSource.PlayOneShot (wakeUpClip);
 		else if (clipToPlay == "orbClip")
 			speechSource.PlayOneShot (orbClip);
+		else if (clipToPlay == "orbNotEnough")
+			Invoke ("PlayOrbNotEnough", 1f);
 		else if (clipToPlay == "doorOpenClip")
 			Invoke ("PlayDoorOpenClip", 2f);
 		else if (clipToPlay == "onAwakeClip") 
@@ -43,6 +46,10 @@ public class AvaController : MonoBehaviour {
 
 	void PlaySpotlightFirstClip() {
 		speechSource.PlayOneShot (spotlightFirstClip);
+	}
+
+	void PlayOrbNotEnough() {
+		speechSource.PlayOneShot (orbNotEnough);
 	}
 
 	void PlayDoorOpenClip() {

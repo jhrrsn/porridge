@@ -33,6 +33,7 @@ public class OrbController : MonoBehaviour {
 	void Update () {
 		if (!fullyCharged && charging && !GetComponent<Collider2D>().IsTouching(focusBeam)) {
 			charging = false;
+			if (Application.loadedLevel == 1) GameObject.FindGameObjectWithTag ("ava").BroadcastMessage("PlayClip", "orbNotEnough");
 		}
 
 		if (!fullyCharged && !charging && chargeLevel > 0f) {
