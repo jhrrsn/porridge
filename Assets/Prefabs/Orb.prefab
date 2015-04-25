@@ -122,7 +122,7 @@ AudioSource:
   m_Pitch: 1
   Loop: 0
   Mute: 0
-  Priority: 128
+  Priority: 1
   DopplerLevel: 1
   MinDistance: 1
   MaxDistance: 500
@@ -187,7 +187,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0184ff86886f974d95dfead14754f36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MultiplicativeColor: {r: .0901960805, g: .564705908, b: .862745166, a: .294117659}
+  MultiplicativeColor: {r: .0901960805, g: .564705908, b: .862745166, a: .372549027}
   AdditiveColor: {r: 0, g: 0, b: 0, a: 0}
   Material: {fileID: 2100000, guid: 0a8c132f813f5514b9f5b48ff3956482, type: 2}
   LightObstacleScale: 1

@@ -463,9 +463,9 @@ MonoBehaviour:
   searchBeamWidth: 5
   searchBeamIntensity: .5
   searchBeamPassiveUse: .25
-  focusBeamWidth: 1
+  focusBeamWidth: 2
   focusBeamIntensity: 1
-  focusBeamDrain: 10
+  focusBeamDrain: 40
   beamTweening: 4
   spotlightAudio: {fileID: 8300000, guid: 9d3125fb597394d288dcb424d206d315, type: 3}
   powerUpAudio: {fileID: 8300000, guid: ea8428074a2a6462ba82ab6503c4c0a7, type: 3}

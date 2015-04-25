@@ -121,6 +121,8 @@ public class PlayerController : MonoBehaviour {
 
 	void Update () {
 
+		Debug.Log (Time.deltaTime);
+
 		if (firstOrb && currentLevel == 1 && transform.position.x < -14f) {
 			ava.BroadcastMessage("PlayClip", "orbClip");
 			firstOrb = false;
@@ -330,7 +332,7 @@ public class PlayerController : MonoBehaviour {
 			}
 
 			if (focusBeamActive) {
-				batteryPower -= focusBeamDrain * batteryDrain;
+				batteryPower -= focusBeamDrain * Time.deltaTime;
 				SetBatteryText();
 			}
 	}
